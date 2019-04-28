@@ -241,7 +241,7 @@ class MaskPostProcessor(nn.Module):
         mask_prob = x.sigmoid()     # (box_num=1, cls_num=2, 14, 14), cls(fg, bg)
 
         # select fg mask
-        mask_prob = mask_prob[0, 1][:, None]
+        mask_prob = mask_prob[0, 1].unsqueeze(0).unsqueeze(0)
 
         boxes_per_image = 1
         mask_prob = mask_prob.split(boxes_per_image, dim=0)

@@ -36,14 +36,6 @@ def align_and_update_state_dicts(model_state_dict, loaded_state_dict):
     max_match_size, idxs = match_matrix.max(1)
     idxs[max_match_size == 0] = -1
 
-    # match_matrix = match_matrix.numpy()
-    # max_match_size = match_matrix.max(1)
-    # import numpy as np
-    # idxs = np.argmax(match_matrix, axis=1)
-    # # remove indices that correspond to no-match
-    # idxs[max_match_size == 0] = -1
-    # idxs = torch.tensor(idxs)
-
     # used for logging
     max_size = max([len(key) for key in current_keys]) if current_keys else 1
     max_size_loaded = max([len(key) for key in loaded_keys]) if loaded_keys else 1

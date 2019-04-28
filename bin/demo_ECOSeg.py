@@ -8,7 +8,7 @@ import sys
 sys.path.append('./')
 import time
 
-from eco import ECOTracker
+from eco.tracker import ECOTracker
 from PIL import Image
 
 import argparse
@@ -29,6 +29,7 @@ class Metric:
         for key in self.mask.keys():
             print('mask:', key, self.mask[key] / total_frame)
         print('update:', self.update / total_frame)
+
 
 def main(video_dir):
     # load videos

@@ -39,7 +39,7 @@ def has_valid_annotation(anno):
 
 class COCODataset(torchvision.datasets.coco.CocoDetection):
     def __init__(
-        self, ann_file, root, remove_images_without_annotations, transforms=None
+        self, ann_file, root, remove_images_without_annotations, transforms=None, category=None
     ):
         super(COCODataset, self).__init__(root, ann_file)
         # sort indices for reproducible results
@@ -51,8 +51,17 @@ class COCODataset(torchvision.datasets.coco.CocoDetection):
             for img_id in self.ids:
                 ann_ids = self.coco.getAnnIds(imgIds=img_id, iscrowd=None)
                 anno = self.coco.loadAnns(ann_ids)
+                # if has_valid_annotation(anno):
+                #     ids.append(img_id)
                 if has_valid_annotation(anno):
-                    ids.append(img_id)
+                    if category:
+                        for target in anno:
+                            if target['category_id'] in category:
+                                ids.append(img_id)
+                                break
+                    else:
+                        ids.append(img_id)
+
             self.ids = ids
 
         self.json_category_id_to_contiguous_id = {
@@ -63,13 +72,15 @@ class COCODataset(torchvision.datasets.coco.CocoDetection):
         }
         self.id_to_img_map = {k: v for k, v in enumerate(self.ids)}
         self.transforms = transforms
+        self.category = category
 
     def __getitem__(self, idx):
         img, anno = super(COCODataset, self).__getitem__(idx)
 
         # filter crowd annotations
         # TODO might be better to add an extra field
-        anno = [obj for obj in anno if obj["iscrowd"] == 0]
+        # anno = [obj for obj in anno if obj["iscrowd"] == 0]
+        anno = [obj for obj in anno if obj["iscrowd"] == 0 and obj["category_id"] in self.category]
         anno_idx = random.randint(0, len(anno) - 1)  # choose one object randomly
         anno = [anno[anno_idx]]
 

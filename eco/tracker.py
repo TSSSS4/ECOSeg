@@ -7,8 +7,7 @@ from scipy import signal
 # from numpy.fft import fftshift
 
 from .config import config
-# from .features import FHogFeature, TableFeature, mround, ResNet50Feature, MaskRCNN
-from .features import MaskRCNN
+from .features.features import mround, MaskRCNN
 from .fourier_tools import cfft2, interpolate_dft, shift_sample, full_fourier_coeff,\
         cubic_spline_fourier, compact_fourier_coeff, ifft2, fft2, sample_fs
 from .optimize_score import optimize_score
@@ -171,11 +170,7 @@ class ECOTracker:
         self._features = []
         cnn_feature_idx = -1
         for idx, feature in enumerate(features):
-            if feature['fname'] == 'cn' or feature['fname'] == 'ic':
-                self._features.append(TableFeature(**feature))
-            elif feature['fname'] == 'fhog':
-                self._features.append(FHogFeature(**feature))
-            elif feature['fname'].startswith('cnn'):
+            if feature['fname'].startswith('cnn'):
                 cnn_feature_idx = idx
                 netname = feature['fname'].split('-')[1]
                 if netname == 'resnet50':

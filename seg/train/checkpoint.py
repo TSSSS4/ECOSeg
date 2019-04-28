@@ -118,7 +118,7 @@ class DetectronCheckpointer(Checkpointer):
         # catalog lookup
         if f.startswith("catalog://"):
             paths_catalog = import_file(
-                "eco.features.model.config.paths_catalog", self.cfg.paths_catalog, True
+                "seg.config.paths_catalog", self.cfg.paths_catalog, True
             )
             catalog_f = paths_catalog.ModelCatalog.get(f[len("catalog://") :])
             self.logger.info("{} points to {}".format(f, catalog_f))

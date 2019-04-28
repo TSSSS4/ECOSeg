@@ -24,9 +24,6 @@ from ..config import config
 from . import _gradient
 
 
-
-
-
 def mround(x):
     x_ = x.copy()
     idx = (x - np.floor(x)) >= 0.5
@@ -117,8 +114,9 @@ class MaskRCNN:
         # construct backbone and roi_head
         self.backbone = build_resnet_backbone()
         self.roi_heads = build_roi_heads(self.backbone.out_channels)
-        self.backbone = self._load_weights(self.backbone, config.backbone_ck_path)
-        self.roi_heads = self._load_weights(self.roi_heads, config.roi_heads_ck_path)
+        self.load_weights(config.checkpoint_path)
+        # self.backbone = self._load_weights(self.backbone, config.backbone_ck_path)
+        # self.roi_heads = self._load_weights(self.roi_heads, config.roi_heads_ck_path)
 
         self.cpu_device = torch.device("cpu")
         if config.use_gpu:
@@ -152,6 +150,25 @@ class MaskRCNN:
         self.data_sz = [np.ceil(img_sample_sz / 4).astype(np.int32),
                         np.ceil(img_sample_sz / total_stride).astype(np.int32)]
         return img_sample_sz
+
+    def load_weights(self, file_path):
+
+        def helper(model, loaded_state_dict, prefix=None):
+            model_state_dict = model.state_dict()
+            for key in model_state_dict.keys():
+                load_key = prefix + key
+                if loaded_state_dict[load_key] is not None:
+                    model_state_dict[key] = loaded_state_dict[load_key]
+                else:
+                    print(key)
+            model.load_state_dict(model_state_dict)
+            for param in model.parameters():
+                param.requires_grad = False
+            return model
+
+        checkpoint = torch.load(file_path, map_location={'cuda:0': 'cpu'})
+        helper(self.backbone, checkpoint['model'], prefix='backbone.')
+        helper(self.roi_heads, checkpoint['model'], prefix='roi_heads.')
 
     def _load_weights(self, model, file_path):
         checkpoint = torch.load(file_path)
@@ -283,10 +300,13 @@ class MaskRCNN:
         if metric:
             metric.mask['minRect'] += time.time() - start
             start = time.time()
-            # res = cv2.polylines(self.patches[0], [box], True, (0,255,0))
-            # plt.ion()
-            # plt.imshow(res)
-            # plt.pause(0.1)
+            res = cv2.polylines(self.patches[0], [box], True, (0,255,0))
+
+            prediction.add_field("mask", masks)
+            res = self.overlay_mask(self.patches[0], prediction)
+            plt.ion()
+            plt.imshow(res)
+            plt.pause(0.1)
 
     def overlay_mask(self, image, predictions):
         """
@@ -299,9 +319,8 @@ class MaskRCNN:
                 It should contain the field `mask` and `labels`.
         """
         masks = predictions.get_field("mask").numpy()
-        labels = predictions.get_field("labels")
 
-        colors = self.compute_colors_for_labels(labels).tolist()
+        colors = [(0, 255, 0)]
 
         for mask, color in zip(masks, colors):
             thresh = mask[0, :, :, None]

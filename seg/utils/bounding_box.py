@@ -42,6 +42,9 @@ class BoxList(object):
     def get_field(self, field):
         return self.extra_fields[field]
 
+    def remove_field(self, field):
+        self.extra_fields.pop(field)
+
     def has_field(self, field):
         return field in self.extra_fields
 
