@@ -147,7 +147,7 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, start_iter=0):
     aspect_grouping = [1] if cfg.aspect_ratio_grouping else []
 
     paths_catalog = import_file(
-        "eco.features.model.config.paths_catalog", cfg.paths_catalog, True
+        "seg.config.paths_catalog", cfg.paths_catalog, True
     )
     DatasetCatalog = paths_catalog.DatasetCatalog
     dataset_list = cfg.datasets_train if is_train else cfg.datasets_test

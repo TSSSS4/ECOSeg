@@ -79,10 +79,12 @@ class COCODataset(torchvision.datasets.coco.CocoDetection):
 
         # filter crowd annotations
         # TODO might be better to add an extra field
-        # anno = [obj for obj in anno if obj["iscrowd"] == 0]
-        anno = [obj for obj in anno if obj["iscrowd"] == 0 and obj["category_id"] in self.category]
-        anno_idx = random.randint(0, len(anno) - 1)  # choose one object randomly
-        anno = [anno[anno_idx]]
+        if self.category:
+            anno = [obj for obj in anno if obj["iscrowd"] == 0 and obj["category_id"] in self.category]
+        else:
+            anno = [obj for obj in anno if obj["iscrowd"] == 0]
+        # anno_idx = random.randint(0, len(anno) - 1)  # choose one object randomly
+        # anno = [anno[anno_idx]]
 
         boxes = [obj["bbox"] for obj in anno]
         boxes = torch.as_tensor(boxes).reshape(-1, 4)  # guard against no boxes

@@ -19,7 +19,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
 def train(local_rank, distributed):
 
-    model = ECOSeg(config=config)
+    model = ECOSeg(config=config.data_argument)
     device = torch.device(config.device)
     model.to(device)
 

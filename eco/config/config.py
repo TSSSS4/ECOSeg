@@ -122,8 +122,8 @@ class ECOSegConfig:
     ## roi head mask
     # Feature extractor
     roi_mask_pooler_resolution = 14  # divide roi into 7*7
-    roi_mask_pooler_scales = (0.25, 0.125, 0.0625, 0.03125)
-    roi_mask_pooler_sampling_scale = 2
+    roi_mask_pooler_scales = (0.0625,)
+    roi_mask_pooler_sampling_scale = 0
 
     roi_mask_conv_layers = (256, 256, 256, 256)
     roi_mask_dialation = 1
@@ -168,11 +168,11 @@ class ECOSegConfig:
     # Datasets
     datasets_train = ('coco_2014_train', 'coco_2014_valminusminival')
     datasets_test = ('coco_2014_minival',)
-    category = [1]  # category id to use, None for all categories
-    min_size_train = min_sample_size
-    max_size_train = max_sample_size
-    min_size_test = min_sample_size
-    max_size_test = max_sample_size
+    category = None  # [ids,]category id to use, None for all categories
+    min_size_train = 800
+    max_size_train = 1333
+    min_size_test = 800
+    max_size_test = 1333
     to_bgr255 = True
     pixel_mean = [102.9801, 115.9465, 122.7717]
     pixel_std = [1.0, 1.0, 1.0]
@@ -180,6 +180,7 @@ class ECOSegConfig:
     num_workers = 4
 
     data_argument = DataArgument()
+    # data_argument = None
 
 
 config = ECOSegConfig()

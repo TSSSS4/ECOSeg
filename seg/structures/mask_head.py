@@ -364,7 +364,7 @@ class ROIMaskLossComputation(object):
         mask_targets = cat(mask_targets, dim=0)
 
         # positive_inds = torch.nonzero(labels > 0).squeeze(1)
-        positive_inds = torch.tensor([0, 1])
+        positive_inds = torch.arange(len(mask_targets))
 
         # torch.mean (in binary_cross_entropy_with_logits) doesn't
         # accept empty tensors, so handle it separately
@@ -373,6 +373,7 @@ class ROIMaskLossComputation(object):
 
         # mask_logits(n, c, w, h)
         # why mask_logits[:,1]? all n proposal is positive, only 2 classes(bg, fg)
+        # : indicates all proposals are positive, and 1 indicates fg
         mask_loss = F.binary_cross_entropy_with_logits(
             mask_logits[:, 1], mask_targets
         )
